@@ -199,17 +199,9 @@ functions:
           type: bytes
   - name: p256Verify
     address: "0x0000000000000000000000000000000044000001"
-    isConfidential: true
+    isConfidential: false
     input:
-      - name: hash
-        type: bytes
-      - name: r
-        type: bytes
-      - name: s
-        type: bytes
-      - name: x
-        type: bytes
-      - name: y
+      - name: inputHex
         type: bytes
     output:
       packed: true

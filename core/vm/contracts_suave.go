@@ -2,11 +2,13 @@ package vm
 
 import (
 	"fmt"
+	"math/big"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto/secp256r1"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
 	suave "github.com/ethereum/go-ethereum/suave/core"
@@ -130,6 +132,30 @@ func formatPeekerError(format string, args ...any) ([]byte, error) {
 
 type suaveRuntime struct {
 	suaveContext *SuaveContext
+}
+
+func (b *suaveRuntime) p256Verify(inputHex []byte) ([]byte, error) {
+	// Required input length is 160 bytes
+	const p256VerifyInputLength = 160
+
+	// Check the input length
+	if len(inputHex) != p256VerifyInputLength {
+		// Input length is invalid
+		return nil, nil
+	}
+	// Extract the hash, r, s, x, y from the input
+	hash := inputHex[0:32]
+	r, s := new(big.Int).SetBytes(inputHex[32:64]), new(big.Int).SetBytes(inputHex[64:96])
+	x, y := new(big.Int).SetBytes(inputHex[96:128]), new(big.Int).SetBytes(inputHex[128:160])
+
+	// Verify the secp256r1 signature
+	if secp256r1.Verify(hash, r, s, x, y) {
+		// Signature is valid
+		return common.LeftPadBytes(common.Big1.Bytes(), 32), nil
+	} else {
+		// Signature is invalid
+		return nil, nil
+	}
 }
 
 var _ SuaveRuntime = &suaveRuntime{}

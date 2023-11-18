@@ -2,6 +2,7 @@ package vm
 
 import (
 	"context"
+	"encoding/hex"
 	"math/big"
 	"regexp"
 	"strings"
@@ -252,4 +253,17 @@ func TestSuave_ConfStoreWorkflow(t *testing.T) {
 	b.suaveContext.CallerStack = []*common.Address{}
 	_, err = b.confidentialRetrieve(bid.Id, "key")
 	require.Error(t, err)
+}
+
+func TestSuave_P256Verify(t *testing.T) {
+	b := newTestBackend(t)
+
+	input := "4cee90eb86eaa050036147a12d49004b6b9c72bd725d39d4785011fe190f0b4da73bd4903f0ce3b639bbbf6e8e80d16931ff4bcf5993d58468e8fb19086e8cac36dbcd03009df8c59286b162af3bd7fcc0450c9aa81be5d10d312af6c66b1d604aebd3099c618202fcfe16ae7770b0c49ab5eadf74b754204a3bb6060e44eff37618b065f9832de4ca6ca971a7a1adc826d0f7c00181a5fb2ddf79ae00b4e10e"
+	inputHex, _ := hex.DecodeString(input)
+
+	output, err := b.p256Verify(inputHex)
+
+	expected, _ := hex.DecodeString("0000000000000000000000000000000000000000000000000000000000000001")
+	require.Equal(t, output, expected)
+	require.NoError(t, err)
 }

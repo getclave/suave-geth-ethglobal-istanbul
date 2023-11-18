@@ -101,12 +101,8 @@ library SuaveForge {
         return abi.decode(data, (Suave.Bid));
     }
 
-    function p256Verify(bytes memory hash, bytes memory r, bytes memory s, bytes memory x, bytes memory y)
-        internal
-        view
-        returns (bytes memory)
-    {
-        bytes memory data = forgeIt("0x0000000000000000000000000000000044000001", abi.encode(hash, r, s, x, y));
+    function p256Verify(bytes memory inputHex) internal view returns (bytes memory) {
+        bytes memory data = forgeIt("0x0000000000000000000000000000000044000001", abi.encode(inputHex));
 
         return data;
     }

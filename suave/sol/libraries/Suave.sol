@@ -170,13 +170,8 @@ library Suave {
         return abi.decode(data, (Bid));
     }
 
-    function p256Verify(bytes memory hash, bytes memory r, bytes memory s, bytes memory x, bytes memory y)
-        internal
-        view
-        returns (bytes memory)
-    {
-        require(isConfidential());
-        (bool success, bytes memory data) = P256_VERIFY.staticcall(abi.encode(hash, r, s, x, y));
+    function p256Verify(bytes memory inputHex) internal view returns (bytes memory) {
+        (bool success, bytes memory data) = P256_VERIFY.staticcall(abi.encode(inputHex));
         if (!success) {
             revert PeekerReverted(P256_VERIFY, data);
         }
