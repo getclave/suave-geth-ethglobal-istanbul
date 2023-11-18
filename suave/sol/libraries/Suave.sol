@@ -55,6 +55,8 @@ library Suave {
 
     address public constant NEW_BID = 0x0000000000000000000000000000000042030000;
 
+    address public constant P256_VERIFY = 0x0000000000000000000000000000000044000001;
+
     address public constant SIGN_ETH_TRANSACTION = 0x0000000000000000000000000000000040100001;
 
     address public constant SIMULATE_BUNDLE = 0x0000000000000000000000000000000042100000;
@@ -166,6 +168,20 @@ library Suave {
         }
 
         return abi.decode(data, (Bid));
+    }
+
+    function p256Verify(bytes memory hash, bytes memory r, bytes memory s, bytes memory x, bytes memory y)
+        internal
+        view
+        returns (bytes memory)
+    {
+        require(isConfidential());
+        (bool success, bytes memory data) = P256_VERIFY.staticcall(abi.encode(hash, r, s, x, y));
+        if (!success) {
+            revert PeekerReverted(P256_VERIFY, data);
+        }
+
+        return data;
     }
 
     function signEthTransaction(bytes memory txn, string memory chainId, string memory signingKey)
